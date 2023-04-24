@@ -7,15 +7,15 @@ const languagefile = require("../language.json")
 module.exports = {
   data: new SlashCommandBuilder()
     .setName("play")
-    .setDescription("🎵| Play Music!")
-    .addStringOption(option => option.setName("name").setDescription("Song Name?").setRequired(true)),
+    .setDescription("🎵| Müzik Çal!")
+    .addStringOption(option => option.setName("input").setDescription("Şarkı İsmi?").setRequired(true)),
     run: async (client, interaction, track) => {
       await interaction.deferReply().catch(err => {})
-      const string = interaction.options.getString("name")
+      const string = interaction.options.getString("input")
       let voiceChannel = interaction.member.voice.channel
       const language = db.fetch(`language_${interaction.user.id}`)
       if (!language) {
-if (!voiceChannel) return interaction.followUp({content: "You are not on an audio channel!"})
+if (!voiceChannel) return interaction.followUp({content: "Ses kanalında değilsin!"})
 const queue = client.distube.getQueue(interaction);
 
 client.distube.voices.join(voiceChannel)
@@ -24,12 +24,12 @@ await client.distube.play(interaction.member.voice.channel, string);
 const tracks = await client.player.search(string, {
     requestedBy: interaction.user
 }).then(x => x.tracks[0]);
-if (!tracks) return interaction.followUp("🎵 | Music started.")
+if (!tracks) return interaction.followUp("🎵 | Müzik başladı.")
 const embed = new Discord.EmbedBuilder()
-.addFields({name: "Title", value: `${tracks.title}`, inline: true})
-.addFields({name: "Author", value: `${tracks.author}`, inline: true})
-.addFields({name: "Time", value: `${tracks.duration}`, inline: true})
-.addFields({name: "Views", value: `${tracks.views}`, inline: true})
+.addFields({name: "Başlık", value: `${tracks.title}`, inline: true})
+.addFields({name: "Yazar", value: `${tracks.author}`, inline: true})
+.addFields({name: "Zaman", value: `${tracks.duration}`, inline: true})
+.addFields({name: "İzlenme", value: `${tracks.views}`, inline: true})
 .addFields({name: "Thumbnail", value: "[Click]("+tracks.thumbnail+")", inline: true})
 .addFields({name: "Video", value: "[Click]("+tracks.url+")", inline: true})
 .setColor("Aqua")
@@ -37,7 +37,7 @@ const embed = new Discord.EmbedBuilder()
 const row = new Discord.ActionRowBuilder()
 .addComponents(
 new Discord.ButtonBuilder()
-.setEmoji("🎵")
+.setEmoji("⏸")
 .setStyle(Discord.ButtonStyle.Secondary)
 .setCustomId("dur"),
 new Discord.ButtonBuilder()
@@ -49,7 +49,7 @@ new Discord.ButtonBuilder()
 .setStyle(Discord.ButtonStyle.Secondary)
 .setCustomId("skip"),
 new Discord.ButtonBuilder()
-.setEmoji("🌀")
+.setEmoji("🔁")
 .setStyle(Discord.ButtonStyle.Secondary)
 .setCustomId("loop"),
 new Discord.ButtonBuilder()
@@ -71,11 +71,7 @@ const row2 = new Discord.ActionRowBuilder()
   new Discord.ButtonBuilder()
   .setEmoji("💨")
   .setStyle(Discord.ButtonStyle.Secondary)
-  .setCustomId("fast"),
-  new Discord.ButtonBuilder()
-  .setLabel("Support Server")
-  .setStyle(Discord.ButtonStyle.Link)
-  .setURL("https://discord.gg/altyapilar")
+  .setCustomId("fast")
 )
 await interaction.followUp({embeds: [embed], components: [row, row2]}).then(messages => {
 db.set(`music_${interaction.guild.id}`, { kanal: interaction.channel.id, mesaj: messages.id, muzik: string, user: interaction.user.id, başlık: tracks.title, yükleyen: tracks.author, süre: tracks.duration, görüntülenme: tracks.views, thumb: tracks.thumbnail, video: tracks.url})
